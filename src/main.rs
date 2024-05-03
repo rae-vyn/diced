@@ -122,7 +122,7 @@ fn main() {
                 roll_die(&die, &arguments, &mut rng);
                 if rng.gen_range(1..=(80 - whoami::username().len() as i32))
                     >= (80 - whoami::username().len() as i32) - 20
-                    && !arguments.painless
+                    && arguments.painful
                 {
                     let plural: &str;
                     match die.quantity() {

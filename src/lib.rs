@@ -64,5 +64,5 @@ pub struct Args {
 
     /// Removes some unwanted 'features'.
     #[arg(long)]
-    pub painless: bool
+    pub painful: bool
 }

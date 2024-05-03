@@ -10,6 +10,12 @@ use std::process;
 
 fn parse(args: &Args) -> Option<Vec<Die>> {
     if let Ok(match_die) =
+        /*
+        - This Regex Grabs:
+            - The quantity of dice to throw
+            - The size (side number) of dice to throw
+            - An optional modifier that adds/deducts from the die roll
+        */
         Regex::new(r"(?m)(?<quantity>\d+)[d\\/](?<size>\d+)(?<modifier>[\+\-]\d+)?")
     {
         let mut dice = vec![];

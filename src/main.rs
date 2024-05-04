@@ -76,14 +76,16 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
         );
         println!("{}d{} {}:", die.quantity(), die.size(), mod_string);
     }
-    let rolls: Vec<u16> = vec![0; die.quantity().into()];
-    let mut sum: i16 = 0;
+    let pool: Vec<u16> = vec![0; die.quantity().into()];
     let mut successes: u16 = 0;
     let mut failures: u16 = 0;
-    let colored_rolls: Vec<String> = rolls
+    let rolls: Vec<u16> = pool.clone()
         .into_iter()
         .map(|_| rng.gen_range(1..=die.size()))
-        .inspect(|x| sum += (*x as i16) + die.modifier())
+        .collect();
+    let sum: u16 = rolls.iter().sum();
+    let colored_rolls: Vec<String> = rolls
+        .into_iter()
         .inspect(|x| {
             if *x >= die.size() {
                 successes += 1
@@ -100,6 +102,7 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
             )
         })
         .collect();
+    
     if arguments.sum {
         println!("=> ({}): [{}]", colored_rolls.join(", "), sum);
     } else if arguments.count {
@@ -116,14 +119,12 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
 fn main() {
     let arguments = Args::parse();
     let mut rng = thread_rng();
+
     match parse(&arguments) {
         Some(dice) => {
             for die in dice {
                 roll_die(&die, &arguments, &mut rng);
-                if rng.gen_range(1..=(80 - whoami::username().len() as i32))
-                    >= (80 - whoami::username().len() as i32) - 20
-                    && arguments.painful
-                {
+                if rng.gen_range(1..=100) > 78 && arguments.painful {
                     let plural: &str;
                     match die.quantity() {
                         1 => plural = "die",

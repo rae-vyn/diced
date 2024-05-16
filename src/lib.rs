@@ -1,9 +1,9 @@
 use clap::Parser;
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::fmt;
 use std::process;
 use std::vec;
-use regex::Regex;
 
 /// The die model.
 #[derive(Serialize, Deserialize, Debug)]
@@ -13,36 +13,41 @@ pub struct Die {
     /// The number of sides on the die.
     size: u16,
     /// The number to add/substract to the roll.
-    modifier: i16
-
+    modifier: i16,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct DiceSet {
     name: String,
-    dice: Vec<Die>
+    dice: Vec<Die>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Profile {
     ident: String,
-    sets: Vec<DiceSet>
+    sets: Vec<DiceSet>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    profiles: Vec<Profile>
+    profiles: Vec<Profile>,
 }
 
 impl ::std::default::Default for DiceSet {
     fn default() -> Self {
-        Self { name: "".to_string(), dice: vec![] }
+        Self {
+            name: "".to_string(),
+            dice: vec![],
+        }
     }
 }
 
 impl ::std::default::Default for Profile {
     fn default() -> Self {
-        Self { ident: "".to_string(), sets: vec![] }
+        Self {
+            ident: "".to_string(),
+            sets: vec![],
+        }
     }
 }
 
@@ -65,7 +70,11 @@ impl Die {
             eprintln!("Improper Die Size {size}");
             process::exit(1);
         };
-        return Self { quantity, size, modifier };
+        return Self {
+            quantity,
+            size,
+            modifier,
+        };
     }
 
     pub fn size(&self) -> u16 {
@@ -104,7 +113,7 @@ pub fn validate(dice: Vec<String>, match_die: Regex) -> Vec<Die> {
         } else {
             result.push(Die::new(quantity, size, 0));
         };
-    };
+    }
     result
 }
 
@@ -113,7 +122,7 @@ pub fn validate(dice: Vec<String>, match_die: Regex) -> Vec<Die> {
 pub struct Args {
     /// The dice to roll.
     pub dice: Vec<String>,
-    
+
     /// Color crit. successes and fails.
     #[arg(short, long)]
     pub color: bool,
@@ -132,5 +141,5 @@ pub struct Args {
 
     /// Use a profile with a given name
     #[arg(long)]
-    pub profile: Option<String>
+    pub profile: Option<String>,
 }

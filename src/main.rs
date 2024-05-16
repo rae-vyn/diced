@@ -1,10 +1,10 @@
 use ansi_term::Colour::{Blue, Red};
 use clap::Parser;
-use diced::{Args, Die, DiceSet, Profile, Config, validate};
+use confy;
+use diced::{validate, Args, Die};
 use rand::prelude::*;
 use regex::Regex;
 use std::process;
-use confy;
 
 /// DICED
 /// A dice roller with no bugs, only features. /j
@@ -58,7 +58,8 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
     let pool: Vec<u16> = vec![0; die.quantity().into()];
     let mut successes: u16 = 0;
     let mut failures: u16 = 0;
-    let rolls: Vec<u16> = pool.clone()
+    let rolls: Vec<u16> = pool
+        .clone()
         .into_iter()
         .map(|_| rng.gen_range(1..=die.size()))
         .collect();
@@ -81,7 +82,7 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
             )
         })
         .collect();
-    
+
     if arguments.sum {
         println!("=> ({}): [{}]", colored_rolls.join(", "), sum);
     } else if arguments.count {
@@ -96,7 +97,7 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
     }
 }
 
-fn main() -> Result<(), confy::ConfyError>{
+fn main() -> Result<(), confy::ConfyError> {
     let arguments = Args::parse();
     let mut rng = thread_rng();
 

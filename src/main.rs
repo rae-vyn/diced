@@ -1,9 +1,10 @@
 use ansi_term::Colour::{Blue, Red};
 use clap::Parser;
-use diced::{Args, Die};
+use diced::{Args, Die, DiceSet, Profile, Config, validate};
 use rand::prelude::*;
 use regex::Regex;
 use std::process;
+use confy;
 
 /// DICED
 /// A dice roller with no bugs, only features. /j
@@ -18,29 +19,7 @@ fn parse(args: &Args) -> Option<Vec<Die>> {
         */
         Regex::new(r"(?m)(?<quantity>\d+)[d\\/](?<size>\d+)(?<modifier>[\+\-]\d+)?")
     {
-        let mut dice = vec![];
-        for die in &args.dice {
-            let capture = match_die.captures(&die).unwrap_or_else(|| {
-                eprintln!("[ERR] ~> Die entered improperly: {}", die);
-                process::exit(1);
-            });
-            let size: u16 = capture["size"].parse().unwrap_or_else(|_| {
-                eprintln!("[ERR] ~> Die size too large: {}", die);
-                eprintln!("[ERR] ~> [Limit is {}]", u16::MAX);
-                process::exit(1);
-            });
-            let quantity: u16 = capture["quantity"].parse().unwrap_or_else(|_| {
-                eprintln!("[ERR] ~> Die quantity too large: {}", die);
-                eprintln!("[ERR] ~> [Limit is {}]", u16::MAX);
-                process::exit(1);
-            });
-            if let Some(modifier) = capture.get(3) {
-                let temp_mod: i16 = modifier.as_str().parse().expect("huh?");
-                dice.push(Die::new(quantity, size, temp_mod));
-            } else {
-                dice.push(Die::new(quantity, size, 0));
-            };
-        }
+        let dice = validate(args.dice.clone(), match_die);
         if dice.len() == 0 {
             eprintln!("[ERR] ~> No die passed in.");
             process::exit(1);
@@ -116,7 +95,8 @@ fn roll_die(die: &Die, arguments: &Args, rng: &mut ThreadRng) -> () {
         println!("=> ({})", colored_rolls.join(", "));
     }
 }
-fn main() {
+
+fn main() -> Result<(), confy::ConfyError>{
     let arguments = Args::parse();
     let mut rng = thread_rng();
 
@@ -134,6 +114,7 @@ fn main() {
                     roll_die(&die, &arguments, &mut rng);
                 }
             }
+            Ok(())
         }
         None => {
             panic!("oh!");

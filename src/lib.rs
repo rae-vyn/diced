@@ -135,7 +135,7 @@ pub struct Args {
     #[arg(long)]
     pub count: bool,
 
-    /// Removes some unwanted 'features'.
+    /// Adds some unwanted 'features'.
     #[arg(long)]
     pub painful: bool,
 
